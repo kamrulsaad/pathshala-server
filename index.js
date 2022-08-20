@@ -11,11 +11,12 @@ app.use(express.json())
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@pathshala.teib2db.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
-async function run(){
-    try{
+async function run() {
+    try {
         await client.connect()
 
         const coursesCollection = client.db('pathshala').collection('courses');
+        const flatsCollection = client.db('basakoi').collection('flats');
 
         app.get('/courses', async (req, res) => {
             const query = {}
@@ -24,15 +25,35 @@ async function run(){
             res.send(services);
         })
 
-        app.get('/courses/:id', async (req, res) =>{
+        app.get('/courses/:id', async (req, res) => {
             const id = req.params.id
-            const query = {_id : ObjectId(id)}
+            const query = { _id: ObjectId(id) }
             const service = await coursesCollection.findOne(query);
             res.send(service)
         })
 
+        app.get('/flats', async (req, res) => {
+            let query = {}
+            if (req.query.category === 'all') {
+                query = {}
+            }
+            else {
+                query = { category: req.query.category }
+            }
+            const cursor = flatsCollection.find(query)
+            const flats = await cursor.toArray()
+            res.send(flats)
+        })
+
+        app.get('/flats/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: ObjectId(id) }
+            const service = await flatsCollection.findOne(query);
+            res.send(service)
+        })
+
     }
-    finally{
+    finally {
 
     }
 }
