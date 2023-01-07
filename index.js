@@ -37,7 +37,7 @@ async function run() {
 
         app.get('/flats', async (req, res) => {
             let query = {}
-            if (req.query.category.includes('all')) {
+            if (req.query.category === 'all') {
                 query = {}
             }
             else {
